@@ -1,6 +1,6 @@
 name: QuietKeys
 options:
-  bundleIdPrefix: com.quietapps
+  bundleIdPrefix: app.quiet
   deploymentTarget:
     macOS: "13.0"
   createIntermediateGroups: true
@@ -29,7 +29,7 @@ targets:
         buildPhase: resources
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.quietapps.QuietKeys
+        PRODUCT_BUNDLE_IDENTIFIER: app.quiet.QuietKeys
         PRODUCT_NAME: Quiet Keys
         SWIFT_OBJC_BRIDGING_HEADER: QuietKeys/Support/QuietKeys-Bridging-Header.h
         INFOPLIST_KEY_LSUIElement: true

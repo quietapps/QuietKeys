@@ -16,6 +16,6 @@ cask "quiet-keys" do
 
   zap trash: [
     "~/Library/Application Support/Quiet Keys",
-    "~/Library/Preferences/com.quietapps.QuietKeys.plist",
+    "~/Library/Preferences/app.quiet.QuietKeys.plist",
   ]
 end

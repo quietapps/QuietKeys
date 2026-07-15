@@ -67,12 +67,13 @@ private struct GeneralSettings: View {
 
 private struct SoundSettings: View {
     @ObservedObject var state: AppState
+    @State private var expandedBrands: Set<String> = []
 
     var body: some View {
         Form {
             Section("Switches") {
                 ForEach(state.profileManager.brands, id: \.self) { brand in
-                    DisclosureGroup(brand) {
+                    DisclosureGroup(isExpanded: expansionBinding(for: brand)) {
                         ForEach(state.profileManager.profiles(for: brand)) { profile in
                             HStack {
                                 Image(systemName: state.profileID == profile.id
@@ -97,6 +98,20 @@ private struct SoundSettings: View {
                             .contentShape(Rectangle())
                             .onTapGesture { state.profileID = profile.id }
                         }
+                    } label: {
+                        // Whole label row toggles the group, not only the chevron.
+                        Text(brand)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                withAnimation {
+                                    if expandedBrands.contains(brand) {
+                                        expandedBrands.remove(brand)
+                                    } else {
+                                        expandedBrands.insert(brand)
+                                    }
+                                }
+                            }
                     }
                 }
             }
@@ -120,6 +135,15 @@ private struct SoundSettings: View {
         }
         .formStyle(.grouped)
         .padding(.vertical, 8)
+    }
+
+    private func expansionBinding(for brand: String) -> Binding<Bool> {
+        Binding(
+            get: { expandedBrands.contains(brand) },
+            set: { open in
+                if open { expandedBrands.insert(brand) }
+                else { expandedBrands.remove(brand) }
+            })
     }
 }
 
@@ -151,9 +175,9 @@ private struct VisualizerSettings: View {
 private struct AboutSettings: View {
     var body: some View {
         VStack(spacing: 12) {
-            Image(systemName: "keyboard.fill")
-                .font(.system(size: 44))
-                .foregroundStyle(Color.accentColor)
+            Image(nsImage: NSApp.applicationIconImage)
+                .resizable()
+                .frame(width: 72, height: 72)
             Text("Quiet Keys")
                 .font(.title2.bold())
             Text("Version \(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")")
