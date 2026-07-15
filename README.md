@@ -30,7 +30,7 @@ Quiet Keys lives in your menu bar and plays a realistic switch sound for every k
 
 ## Features
 
-**Current release:** version **1.0.0**, build **1**
+**Current release:** version **1.0.0**, build **1** — see [CHANGELOG](CHANGELOG.md) for per-build notes
 
 ### Sound
 
@@ -55,24 +55,33 @@ Quiet Keys lives in your menu bar and plays a realistic switch sound for every k
 
 ## Install
 
+> **Note:** Quiet Keys is not code-signed with an Apple Developer ID. macOS Gatekeeper will warn on first launch. The steps below work around it automatically.
+
 ### Homebrew (recommended)
 
 ```bash
-brew install --cask quietapps/tap/quiet-keys
+brew tap quietapps/quietkeys
+brew install --cask quietkeys
 ```
 
-The tap is at [quietapps/homebrew-tap](https://github.com/quietapps/homebrew-tap).
+The cask strips the macOS quarantine attribute on install so Gatekeeper does not block launch. The tap is at [quietapps/homebrew-quietkeys](https://github.com/quietapps/homebrew-quietkeys).
 
 ### Direct download
 
-1. Grab the latest `QuietKeys.dmg` from [Releases](https://github.com/quietapps/QuietKeys/releases/latest)
-2. Open the DMG → drag **Quiet Keys.app** into `/Applications`
-3. Launch Quiet Keys — the keyboard icon appears in your menu bar
-4. Follow the onboarding window to grant Accessibility access (see [Permissions](#permissions))
+1. Grab the latest `QuietKeys-*.zip` from [Releases](https://github.com/quietapps/QuietKeys/releases/latest)
+2. Unzip → drag **Quiet Keys.app** into `/Applications`
+3. Strip the quarantine attribute (or right-click → Open once):
+
+```bash
+xattr -cr "/Applications/Quiet Keys.app"
+```
+
+4. Launch Quiet Keys — the keyboard icon appears in your menu bar
+5. Follow the onboarding window to grant Accessibility access (see [Permissions](#permissions))
 
 ### If the app doesn't open (Gatekeeper blocked it)
 
-Release DMGs are signed and notarized when built by CI. If you run an unsigned local build, fix Gatekeeper once with any of these:
+macOS silently blocks unsigned binaries on first launch. Fix it once with any of these:
 
 **Option A — Right-click open (no Terminal needed)**
 1. Open Finder → `/Applications`
@@ -97,12 +106,16 @@ xattr -cr "/Applications/Quiet Keys.app"
 
 ```bash
 brew update
-brew upgrade --cask quiet-keys
+brew upgrade --cask quietkeys
 ```
 
 ### Direct download
 
-Download the newer DMG from [Releases](https://github.com/quietapps/QuietKeys/releases) and drag the new **Quiet Keys.app** over the old one in `/Applications`.
+Download the newer zip from [Releases](https://github.com/quietapps/QuietKeys/releases), drag the new **Quiet Keys.app** over the old one in `/Applications`, then run:
+
+```bash
+xattr -cr "/Applications/Quiet Keys.app"
+```
 
 Your settings and custom switch profiles are stored separately and are unaffected by app updates.
 
@@ -112,7 +125,10 @@ Your settings and custom switch profiles are stored separately and are unaffecte
 
 ```bash
 # Remove the app and its preferences (via the cask's zap stanza)
-brew uninstall --cask --zap quiet-keys
+brew uninstall --cask --zap quietkeys
+
+# Drop the tap
+brew untap quietapps/quietkeys
 
 # Purge Homebrew's download cache
 brew cleanup --prune=all -s
