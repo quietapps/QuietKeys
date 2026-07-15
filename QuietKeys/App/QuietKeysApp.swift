@@ -11,7 +11,7 @@ struct QuietKeysApp: App {
         } label: {
             Image(systemName: state.enabled ? "keyboard.fill" : "keyboard")
         }
-        .menuBarExtraStyle(.window)
+        .menuBarExtraStyle(.menu)
 
         Settings {
             SettingsView(state: state)

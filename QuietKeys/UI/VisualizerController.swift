@@ -2,13 +2,42 @@ import AppKit
 import SwiftUI
 
 enum VisualizerPosition: String, CaseIterable, Identifiable {
-    case followCursor = "Follow cursor"
-    case bottomLeft = "Bottom left"
-    case bottomCenter = "Bottom center"
-    case bottomRight = "Bottom right"
-    case topCenter = "Top center"
+    case followCursor = "Follow Cursor"
+    case topLeft = "Top Left"
+    case topCenter = "Top Center"
+    case topRight = "Top Right"
+    case bottomLeft = "Bottom Left"
+    case bottomCenter = "Bottom Center"
+    case bottomRight = "Bottom Right"
 
     var id: String { rawValue }
+
+    var icon: String {
+        switch self {
+        case .followCursor: return "cursorarrow"
+        case .topLeft: return "rectangle.inset.topleft.filled"
+        case .topCenter: return "rectangle.tophalf.inset.filled"
+        case .topRight: return "rectangle.inset.topright.filled"
+        case .bottomLeft: return "rectangle.inset.bottomleft.filled"
+        case .bottomCenter: return "rectangle.bottomhalf.inset.filled"
+        case .bottomRight: return "rectangle.inset.bottomright.filled"
+        }
+    }
+
+    /// Migrates values stored by earlier builds ("Bottom center" style).
+    init?(stored: String) {
+        if let exact = VisualizerPosition(rawValue: stored) {
+            self = exact
+            return
+        }
+        if let match = VisualizerPosition.allCases.first(where: {
+            $0.rawValue.lowercased() == stored.lowercased()
+        }) {
+            self = match
+            return
+        }
+        return nil
+    }
 }
 
 /// Floating, click-through mini keyboard that lights up pressed keys.
@@ -85,8 +114,14 @@ final class VisualizerController: ObservableObject {
             origin = NSPoint(x: f.midX - size.width / 2, y: f.minY + margin)
         case .bottomRight:
             origin = NSPoint(x: f.maxX - size.width - margin, y: f.minY + margin)
+        case .topLeft:
+            origin = NSPoint(x: f.minX + margin,
+                             y: f.maxY - size.height - margin)
         case .topCenter:
             origin = NSPoint(x: f.midX - size.width / 2,
+                             y: f.maxY - size.height - margin)
+        case .topRight:
+            origin = NSPoint(x: f.maxX - size.width - margin,
                              y: f.maxY - size.height - margin)
         }
         panel.setFrameOrigin(origin)

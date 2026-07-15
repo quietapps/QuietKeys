@@ -58,7 +58,7 @@ final class AppState: ObservableObject {
     private let defaults = UserDefaults.standard
 
     var visualizerPosition: VisualizerPosition {
-        VisualizerPosition(rawValue: visualizerPositionRaw) ?? .bottomCenter
+        VisualizerPosition(stored: visualizerPositionRaw) ?? .bottomCenter
     }
 
     // MARK: - Runtime
