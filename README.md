@@ -1,40 +1,177 @@
-# quiet keys
+<div align="center">
 
-**Your keyboard, but better.** A native macOS menu-bar app that plays realistic mechanical keyboard switch sounds on every keystroke and mouse click. Free, open source, and fully offline.
+<img src="QuietKeys/Resources/Assets.xcassets/AppIcon.appiconset/icon_512.png" alt="Quiet Keys" width="128" height="128" />
 
-- **22 switch profiles** across IQUNIX, Lofree, Akko, Keychron, Aflion, Durock, Gateron, NovelKeys, Drop, Kailh, IBM, Topre, Alps — plus a quirky Lizard.
-- **Ultra-low latency** — lock-free audio engine, 128-frame CoreAudio buffer, all samples preloaded. Nothing allocates on the audio thread.
-- **Spatial audio** — keys on the left half of your keyboard play from the left speaker; keys on the right play from the right.
-- **Reactive visualizer** — a floating mini keyboard that lights up keys as you press them. Follow-cursor or fixed positions.
-- **Distinct press and release sounds**, per-key-class samples (space, return, backspace sound deeper), round-robin variants so no two keystrokes sound identical.
-- **Mouse click sounds** for left, right, and middle buttons. Toggleable.
-- **Type-to-hear demo** — built-in typing test with WPM, accuracy, and timer, plus a rendered keyboard that highlights every key.
-- **Completely private** — no data collected, no accounts, no network access, no telemetry. The app never asks for any personal details.
+# Quiet Keys
 
-Requires macOS 13 Ventura or later.
+**Your keyboard, but better.**
+
+A native macOS menu bar app that plays realistic mechanical keyboard switch sounds on every keystroke and mouse click — ultra-low latency, spatial audio, 22 switch profiles, fully offline. Part of the [Quiet Apps](https://github.com/quietapps) family.
+
+[![macOS](https://img.shields.io/badge/macOS-13.0+-000000?logo=apple&logoColor=white)](https://www.apple.com/macos/)
+[![Swift](https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white)](https://swift.org)
+[![SwiftUI](https://img.shields.io/badge/SwiftUI-AppKit-2396F3?logo=swift&logoColor=white)](https://developer.apple.com/xcode/swiftui/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/quietapps/QuietKeys?display_name=tag)](https://github.com/quietapps/QuietKeys/releases)
+[![Downloads](https://img.shields.io/github/downloads/quietapps/QuietKeys/total.svg)](https://github.com/quietapps/QuietKeys/releases)
+[![Stars](https://img.shields.io/github/stars/quietapps/QuietKeys?style=social)](https://github.com/quietapps/QuietKeys/stargazers)
+
+[Install](#install) · [Features](#features) · [Usage](#usage) · [Build from source](#build-from-source) · [FAQ](#faq)
+
+</div>
+
+---
+
+## Why
+
+You love the sound of a good mechanical keyboard — but you're on a MacBook, in an office, or your partner is asleep next door.
+
+Quiet Keys lives in your menu bar and plays a realistic switch sound for every key you press, through your speakers or headphones. Pick from 22 switch profiles across 13 brands, watch keys light up on a floating visualizer, and hear keys on the left of your keyboard from the left speaker. Everything runs on-device. No cloud. No account. No telemetry.
+
+## Features
+
+**Current release:** version **1.0.0**, build **1**
+
+### Sound
+
+- **22 switch profiles** across IQUNIX, Lofree, Akko, Keychron, Aflion, Durock, Gateron, NovelKeys, Drop, Kailh, IBM, Topre, Alps — plus a quirky Lizard
+- **Ultra-low latency** — lock-free audio engine, 128-frame CoreAudio buffer, all samples preloaded; nothing allocates on the audio thread
+- **Spatial audio** — keys on the left half of your keyboard play from the left speaker; keys on the right play from the right
+- **Distinct press and release sounds** — per-key-class samples (space, return, and backspace sound deeper), round-robin variants so no two keystrokes sound identical
+- **Mouse click sounds** for left, right, and middle buttons; toggleable
+- **Original samples** — every shipped sample is synthesized from parametric switch models in this repo; no recordings from other apps
+
+### Visualizer & typing test
+
+- **Reactive visualizer** — a floating mini keyboard that lights up keys as you press them; follow-cursor or fixed screen positions
+- **Typing test** — built-in demo window with WPM, accuracy, and timer, plus a rendered keyboard that highlights every key
+
+### Native macOS feel
+
+- Menu bar agent — no Dock icon
+- 100% Swift — SwiftUI menu + settings, AppKit visualizer overlay
+- No external dependencies — Apple frameworks only
+- **Completely private** — no data collected, no accounts, no network access, no telemetry
 
 ## Install
 
-**GitHub Releases** — download the latest notarized `.dmg` from [Releases](../../releases), drag Quiet Keys to Applications.
+### Homebrew (recommended)
 
-**Homebrew** (optional cask):
-
-```sh
+```bash
 brew install --cask quietapps/tap/quiet-keys
 ```
 
-## Permissions setup
+The tap is at [quietapps/homebrew-tap](https://github.com/quietapps/homebrew-tap).
 
-Quiet Keys listens for keystrokes system-wide through a **listen-only** CGEvent tap. macOS requires the Accessibility permission for this:
+### Direct download
 
-1. Launch Quiet Keys. The onboarding window opens automatically.
-2. Click **Grant Accessibility access** — macOS shows the system prompt.
-3. In **System Settings → Privacy & Security → Accessibility**, enable **Quiet Keys**.
-4. The onboarding window detects the grant automatically and you're done.
+1. Grab the latest `QuietKeys.dmg` from [Releases](https://github.com/quietapps/QuietKeys/releases/latest)
+2. Open the DMG → drag **Quiet Keys.app** into `/Applications`
+3. Launch Quiet Keys — the keyboard icon appears in your menu bar
+4. Follow the onboarding window to grant Accessibility access (see [Permissions](#permissions))
 
-Keystrokes are matched to a sound and immediately forgotten. Nothing is logged, stored, or transmitted — you can audit the input path in [`InputMonitor.swift`](QuietKeys/Input/InputMonitor.swift) and [`AppState.swift`](QuietKeys/App/AppState.swift).
+### If the app doesn't open (Gatekeeper blocked it)
 
-If sounds stop after an OS update, re-toggle the permission (macOS occasionally invalidates event taps on major updates).
+Release DMGs are signed and notarized when built by CI. If you run an unsigned local build, fix Gatekeeper once with any of these:
+
+**Option A — Right-click open (no Terminal needed)**
+1. Open Finder → `/Applications`
+2. Right-click **Quiet Keys.app** → **Open**
+3. Click **Open** in the warning dialog
+4. macOS remembers your choice for every future launch
+
+**Option B — Terminal**
+```bash
+xattr -cr "/Applications/Quiet Keys.app"
+```
+
+**Option C — System Settings**
+1. Try to launch the app — macOS shows a blocked notification
+2. Open **System Settings → Privacy & Security**
+3. Scroll to the message about Quiet Keys
+4. Click **Open Anyway**
+
+## Updating
+
+### Homebrew
+
+```bash
+brew update
+brew upgrade --cask quiet-keys
+```
+
+### Direct download
+
+Download the newer DMG from [Releases](https://github.com/quietapps/QuietKeys/releases) and drag the new **Quiet Keys.app** over the old one in `/Applications`.
+
+Your settings and custom switch profiles are stored separately and are unaffected by app updates.
+
+## Uninstalling
+
+### Homebrew
+
+```bash
+# Remove the app and its preferences (via the cask's zap stanza)
+brew uninstall --cask --zap quiet-keys
+
+# Purge Homebrew's download cache
+brew cleanup --prune=all -s
+```
+
+Optional manual cleanup if you skipped `--zap`:
+
+```bash
+defaults delete app.quiet.QuietKeys 2>/dev/null
+rm -rf ~/Library/Preferences/app.quiet.QuietKeys.plist \
+       ~/Library/Application\ Support/Quiet\ Keys \
+       ~/Library/Caches/app.quiet.QuietKeys \
+       ~/Library/Saved\ Application\ State/app.quiet.QuietKeys.savedState
+```
+
+Also remove Quiet Keys from **System Settings → Privacy & Security → Accessibility**.
+
+### Direct download
+
+```bash
+# Move the app to Trash
+rm -rf "/Applications/Quiet Keys.app"
+
+# Remove settings + custom profiles
+defaults delete app.quiet.QuietKeys 2>/dev/null
+rm -rf ~/Library/Preferences/app.quiet.QuietKeys.plist \
+       ~/Library/Application\ Support/Quiet\ Keys \
+       ~/Library/Caches/app.quiet.QuietKeys \
+       ~/Library/Saved\ Application\ State/app.quiet.QuietKeys.savedState
+```
+
+## Usage
+
+| Action | How |
+|---|---|
+| Enable / disable sounds | Click the keyboard icon → **Enable / Disable Quiet Keys** |
+| Grant Accessibility access | Menu bar → **Grant Accessibility access…** (shows ✓ when granted) |
+| Switch profile | Menu bar → **Switches** → pick a brand and switch |
+| Adjust volume / tone / mouse clicks | Menu bar → **Sound**, or **Settings…** |
+| Toggle the visualizer | Menu bar → **Enable / Disable Visualizer** |
+| Move the visualizer | Menu bar → **Position** → follow cursor or a fixed corner |
+| Try the typing test | Menu bar → **Typing Test** |
+| Open Settings | Menu bar → **Settings…** (`⌘,`) |
+| Quit | Menu bar → **Quit Quiet Keys** (`⌘Q`) |
+
+Once enabled, every keystroke and mouse click plays a sound system-wide. No further interaction needed.
+
+## Permissions
+
+Quiet Keys needs **Accessibility** access to hear your keystrokes system-wide through a **listen-only** CGEvent tap.
+
+1. Launch Quiet Keys — the onboarding window opens automatically
+2. Click **Grant Accessibility access** — macOS shows its standard privacy prompt
+3. In **System Settings → Privacy & Security → Accessibility**, enable **Quiet Keys**
+4. The onboarding window detects the grant automatically and you're done
+
+Keystrokes are matched to a sound and immediately forgotten. Nothing is logged, stored, or transmitted — audit the entire input path in [`InputMonitor.swift`](QuietKeys/Input/InputMonitor.swift) and [`AppState.swift`](QuietKeys/App/AppState.swift).
+
+No network access at all — the app makes zero network calls.
 
 ## Adding a switch profile
 
@@ -72,25 +209,52 @@ Drop the folder into `~/Library/Application Support/Quiet Keys/Profiles/` and re
 
 To contribute a profile to the app itself, add the folder under `QuietKeys/Resources/Profiles/` (or add a parametric definition to `Tools/generate_samples.py`) and open a PR.
 
+## How it works
+
+| Requirement | Implementation |
+|---|---|
+| Audio engine | `AVAudioSourceNode` + 64-voice pool; SPSC lock-free trigger ring (C11 atomics in `Support/qk_atomics.h`); equal-power pan; shelving-EQ tone control |
+| Sample loading | WAVs preloaded to contiguous float buffers at 48 kHz — nothing allocates on the audio thread |
+| Keystroke capture | Listen-only CGEvent tap on a dedicated user-interactive thread |
+| Spatial pan | ANSI key geometry maps each key's physical position to a stereo pan value |
+| Profiles | Discovered from the app bundle and `~/Library/Application Support/Quiet Keys/Profiles/`, decoded from `manifest.json` |
+| Sample synthesis | `Tools/generate_samples.py` — parametric physical switch models; every shipped sample is original |
+| No Dock icon | Menu bar agent (`.accessory` activation policy) |
+
 ## Build from source
 
-Requirements: Xcode 15+, [XcodeGen](https://github.com/yonaskolb/XcodeGen), Python 3 with `numpy` (sample generation only).
+### Requirements
 
-```sh
+- macOS 13.0 (Ventura) or later
+- Xcode 15.0 or later
+- [XcodeGen](https://github.com/yonaskolb/XcodeGen)
+- Python 3 with `numpy` (sample generation only)
+
+No paid Apple Developer account required — local builds use ad-hoc signing (`CODE_SIGN_IDENTITY=-`).
+
+### Steps
+
+```bash
 git clone https://github.com/quietapps/QuietKeys.git
 cd QuietKeys
-python3 Tools/generate_samples.py   # regenerate the sample library (optional; samples are committed)
+python3 Tools/generate_samples.py   # optional; samples are committed
 xcodegen generate
+open QuietKeys.xcodeproj
+```
+
+Press **⌘R** in Xcode. The keyboard icon appears in your menu bar.
+
+Or from the command line:
+
+```bash
 xcodebuild -project QuietKeys.xcodeproj -scheme QuietKeys -configuration Release build
 ```
 
-The built app lands in DerivedData; or open `QuietKeys.xcodeproj` in Xcode and run.
-
 ### Signing & notarization
 
-Local development builds use ad-hoc signing (`CODE_SIGN_IDENTITY=-`). For distribution:
+For distribution:
 
-```sh
+```bash
 xcodebuild -project QuietKeys.xcodeproj -scheme QuietKeys -configuration Release \
   CODE_SIGN_IDENTITY="Developer ID Application: Your Name (TEAMID)" build
 xcrun notarytool submit QuietKeys.dmg --keychain-profile notary --wait
@@ -99,28 +263,87 @@ xcrun stapler staple QuietKeys.dmg
 
 CI (`.github/workflows/release.yml`) builds every push and, when signing secrets are configured, produces a signed + notarized `.dmg` on tagged releases. Required repo secrets: `MACOS_CERTIFICATE_P12`, `MACOS_CERTIFICATE_PASSWORD`, `NOTARY_APPLE_ID`, `NOTARY_TEAM_ID`, `NOTARY_PASSWORD`.
 
-## Architecture
+### Project layout
 
-| Piece | File | Notes |
-|---|---|---|
-| Audio engine | `QuietKeys/Audio/AudioEngine.swift` | `AVAudioSourceNode` + 64-voice pool; SPSC lock-free trigger ring (C11 atomics in `Support/qk_atomics.h`); equal-power pan; shelving-EQ tone control |
-| Sample loading | `QuietKeys/Audio/SampleBuffer.swift` | Preloads WAVs to contiguous float buffers at 48 kHz |
-| Input | `QuietKeys/Input/InputMonitor.swift` | Listen-only CGEvent tap on a dedicated user-interactive thread |
-| Key geometry | `QuietKeys/Input/KeyLayout.swift` | ANSI layout → pan position + visualizer/typing-test rendering |
-| Profiles | `QuietKeys/Profiles/ProfileManager.swift` | Bundle + Application Support discovery, manifest decoding |
-| UI | `QuietKeys/UI/` | Menu-bar dropdown, settings, visualizer panel, typing test, onboarding |
-| Sample synthesis | `Tools/generate_samples.py` | Parametric physical model — every shipped sample is original |
+```
+QuietKeys/
+├── App/
+│   ├── QuietKeysApp.swift        # @main, MenuBarExtra, onboarding window
+│   └── AppState.swift            # Published settings, permission polling
+├── Audio/
+│   ├── AudioEngine.swift         # Lock-free engine, voice pool, pan, EQ
+│   └── SampleBuffer.swift        # WAV → 48 kHz float preload
+├── Input/
+│   ├── InputMonitor.swift        # Listen-only CGEvent tap
+│   └── KeyLayout.swift           # ANSI layout → pan + rendering
+├── Profiles/
+│   └── ProfileManager.swift      # Bundle + Application Support discovery
+├── UI/
+│   ├── MenuContent.swift         # Menu bar dropdown
+│   ├── SettingsView.swift        # Settings window
+│   ├── VisualizerController.swift# Floating key visualizer
+│   ├── TypingTestView.swift      # WPM / accuracy demo
+│   └── OnboardingView.swift      # First-run permission flow
+├── Support/
+│   ├── qk_atomics.h              # C11 atomics for the trigger ring
+│   └── QuietKeys-Bridging-Header.h
+└── Resources/
+    └── Profiles/                 # 22 bundled switch profiles
+Tools/
+└── generate_samples.py           # Parametric sample synthesis
+```
 
-All shipped samples are synthesized from parametric switch models in this repo — no recordings from other apps are used.
+No external dependencies — Apple frameworks only (SwiftUI, AppKit, AVFoundation, CoreAudio).
 
-## Privacy
+## Configuration
 
-No data collected. No accounts. No network access. No telemetry or analytics. Fully offline. That's the whole policy.
+All settings are in **Settings** (menu bar icon → **Settings…**). Reset to defaults:
+
+```bash
+defaults delete app.quiet.QuietKeys
+```
+
+This resets preferences only. Custom profiles in `~/Library/Application Support/Quiet Keys/Profiles/` are unaffected.
+
+## FAQ
+
+**Does Quiet Keys send my keystrokes anywhere?**
+No. Zero network calls. Keystrokes are matched to a sound and immediately forgotten — nothing is logged, stored, or transmitted. The input path is small and auditable: [`InputMonitor.swift`](QuietKeys/Input/InputMonitor.swift).
+
+**Is this a keylogger?**
+No. The event tap is listen-only and the key code is used once to pick a sample and a pan position, then discarded. The app has no storage for keystrokes and no network stack to send them over.
+
+**Why does it need Accessibility permission?**
+macOS requires it for any app that observes keystrokes system-wide via a CGEvent tap. Quiet Keys uses a listen-only tap — it cannot modify or block your input.
+
+**Sounds stopped after a macOS update.**
+macOS occasionally invalidates event taps on major updates. Re-toggle Quiet Keys off and on in **System Settings → Privacy & Security → Accessibility**.
+
+**Is there any typing latency?**
+No added typing latency — the tap is listen-only, so your keystrokes pass through untouched. Audio latency is minimal: a 128-frame CoreAudio buffer with all samples preloaded, and nothing allocates on the audio thread.
+
+**Can I add my own switch sounds?**
+Yes — drop a profile folder with a `manifest.json` and WAV samples into `~/Library/Application Support/Quiet Keys/Profiles/` and relaunch. See [Adding a switch profile](#adding-a-switch-profile).
+
+**Where do the shipped samples come from?**
+Every sample is synthesized from parametric physical switch models in `Tools/generate_samples.py`. No recordings from other apps are used.
+
+**Why don't the left and right speakers match some keys?**
+Panning follows the physical ANSI layout — keys on the left half of the keyboard pan left, right half pan right, proportional to position.
+
+**How do I quit?**
+Click the menu bar icon → **Quit Quiet Keys** (`⌘Q`).
 
 ## Feedback
 
-Bug reports and ideas: [GitHub Issues](../../issues). Contributions: see [CONTRIBUTING.md](CONTRIBUTING.md).
+Bug reports and ideas: [GitHub Issues](https://github.com/quietapps/QuietKeys/issues). Contributions: see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-[MIT](LICENSE)
+[MIT](LICENSE) © Quiet Apps
+
+---
+
+<div align="center">
+If Quiet Keys makes your keyboard sing, drop a ⭐ on the repo.
+</div>

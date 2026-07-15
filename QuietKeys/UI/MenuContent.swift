@@ -11,16 +11,29 @@ struct MenuContent: View {
             Button {
                 state.enabled.toggle()
             } label: {
-                Label(state.enabled ? "Disable Quiet Keys" : "Enable Quiet Keys",
-                      systemImage: state.enabled ? "checkmark.circle.fill" : "circle")
+                Label {
+                    Text(state.enabled ? "Disable Quiet Keys" : "Enable Quiet Keys")
+                } icon: {
+                    StatusIcon(on: state.enabled)
+                }
             }
 
-            if !state.hasPermission {
+            if state.hasPermission {
+                Label {
+                    Text("Accessibility access granted")
+                } icon: {
+                    ColoredSymbol("checkmark.circle.fill", color: .systemGreen)
+                }
+            } else {
                 Button {
                     state.requestPermission()
                 } label: {
-                    Label("Grant Accessibility access…",
-                          systemImage: "exclamationmark.triangle")
+                    Label {
+                        Text("Grant Accessibility access…")
+                    } icon: {
+                        ColoredSymbol("exclamationmark.triangle.fill",
+                                      color: .systemOrange)
+                    }
                 }
             }
         }
@@ -47,10 +60,12 @@ struct MenuContent: View {
             Button {
                 state.visualizerEnabled.toggle()
             } label: {
-                Label(state.visualizerEnabled ? "Disable Visualizer"
-                                              : "Enable Visualizer",
-                      systemImage: state.visualizerEnabled
-                          ? "checkmark.circle.fill" : "rectangle.grid.3x2")
+                Label {
+                    Text(state.visualizerEnabled ? "Disable Visualizer"
+                                                 : "Enable Visualizer")
+                } icon: {
+                    StatusIcon(on: state.visualizerEnabled)
+                }
             }
 
             Menu {
@@ -87,6 +102,45 @@ struct MenuContent: View {
         }
     }
 
+}
+
+/// Green filled circle when on, gray hollow circle when off. Rendered as a
+/// non-template NSImage so the native menu keeps the color instead of
+/// flattening it to the standard menu tint.
+private struct StatusIcon: View {
+    let on: Bool
+
+    var body: some View {
+        ColoredSymbol(on ? "circle.fill" : "circle",
+                      color: on ? .systemGreen : .tertiaryLabelColor)
+    }
+}
+
+/// SF Symbol drawn in a fixed color that survives native menu rendering.
+private struct ColoredSymbol: View {
+    let name: String
+    let color: NSColor
+
+    init(_ name: String, color: NSColor) {
+        self.name = name
+        self.color = color
+    }
+
+    var body: some View {
+        Image(nsImage: Self.image(name: name, color: color))
+    }
+
+    private static func image(name: String, color: NSColor) -> NSImage {
+        let config = NSImage.SymbolConfiguration(pointSize: 13, weight: .regular)
+            .applying(.init(paletteColors: [color]))
+        guard let base = NSImage(systemSymbolName: name,
+                                 accessibilityDescription: nil),
+              let symbol = base.withSymbolConfiguration(config) else {
+            return NSImage()
+        }
+        symbol.isTemplate = false
+        return symbol
+    }
 }
 
 /// Menu item that opens the Settings scene; supported action on 14+,
