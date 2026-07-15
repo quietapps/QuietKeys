@@ -59,6 +59,18 @@ final class AppState: ObservableObject {
     private var permissionTimer: Timer?
 
     private init() {
+        // The tap thread reads settings straight from UserDefaults; without
+        // registered defaults an unset key reads as false and mutes the app.
+        UserDefaults.standard.register(defaults: [
+            "enabled": true,
+            "volume": 0.8,
+            "tone": 0.0,
+            "spatialAudio": true,
+            "mouseClicks": true,
+            "releaseSounds": true,
+            "repeatSounds": true,
+        ])
+
         engine.volume = Float(volume)
         engine.configureTone(Float(tone))
         visualizer.position = visualizerPosition
