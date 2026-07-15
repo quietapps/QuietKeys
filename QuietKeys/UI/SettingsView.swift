@@ -67,83 +67,203 @@ private struct GeneralSettings: View {
 
 private struct SoundSettings: View {
     @ObservedObject var state: AppState
-    @State private var expandedBrands: Set<String> = []
+    @State private var search = ""
+    @State private var typeFilter = "All"
 
-    var body: some View {
-        Form {
-            Section("Switches") {
-                ForEach(state.profileManager.brands, id: \.self) { brand in
-                    DisclosureGroup(isExpanded: expansionBinding(for: brand)) {
-                        ForEach(state.profileManager.profiles(for: brand)) { profile in
-                            HStack {
-                                Image(systemName: state.profileID == profile.id
-                                    ? "largecircle.fill.circle" : "circle")
-                                    .foregroundStyle(state.profileID == profile.id
-                                        ? Color.accentColor : .secondary)
-                                VStack(alignment: .leading, spacing: 1) {
-                                    Text(profile.name)
-                                    Text(profile.type)
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
-                                }
-                                Spacer()
-                                Button {
-                                    state.preview(profile)
-                                } label: {
-                                    Image(systemName: "play.circle")
-                                }
-                                .buttonStyle(.borderless)
-                                .help("Preview")
-                            }
-                            .contentShape(Rectangle())
-                            .onTapGesture { state.profileID = profile.id }
-                        }
-                    } label: {
-                        // Whole label row toggles the group, not only the chevron.
-                        Text(brand)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .contentShape(Rectangle())
-                            .onTapGesture {
-                                withAnimation {
-                                    if expandedBrands.contains(brand) {
-                                        expandedBrands.remove(brand)
-                                    } else {
-                                        expandedBrands.insert(brand)
-                                    }
-                                }
-                            }
-                    }
-                }
-            }
-
-            Section("Output") {
-                LabeledContent("Volume") {
-                    Slider(value: $state.volume, in: 0...1.2)
-                }
-                LabeledContent("Tone") {
-                    Slider(value: $state.tone, in: -1...1) {
-                        EmptyView()
-                    } minimumValueLabel: {
-                        Text("Dark").font(.caption)
-                    } maximumValueLabel: {
-                        Text("Bright").font(.caption)
-                    }
-                }
-                Toggle("Spatial audio (pan by key position)",
-                       isOn: $state.spatialAudio)
-            }
-        }
-        .formStyle(.grouped)
-        .padding(.vertical, 8)
+    private var types: [String] {
+        var seen = Set<String>()
+        return ["All"] + state.profileManager.profiles
+            .map(\.type.capitalized)
+            .filter { seen.insert($0).inserted }
+            .sorted()
     }
 
-    private func expansionBinding(for brand: String) -> Binding<Bool> {
-        Binding(
-            get: { expandedBrands.contains(brand) },
-            set: { open in
-                if open { expandedBrands.insert(brand) }
-                else { expandedBrands.remove(brand) }
-            })
+    /// Brands that still have at least one profile after search + type filter,
+    /// in discovery order, paired with their filtered profiles.
+    private var filteredGroups: [(brand: String, profiles: [Profile])] {
+        state.profileManager.brands.compactMap { brand in
+            let profiles = state.profileManager.profiles(for: brand).filter {
+                matches($0)
+            }
+            return profiles.isEmpty ? nil : (brand, profiles)
+        }
+    }
+
+    private func matches(_ profile: Profile) -> Bool {
+        if typeFilter != "All",
+           profile.type.caseInsensitiveCompare(typeFilter) != .orderedSame {
+            return false
+        }
+        guard !search.isEmpty else { return true }
+        return profile.name.localizedCaseInsensitiveContains(search)
+            || profile.brand.localizedCaseInsensitiveContains(search)
+            || profile.type.localizedCaseInsensitiveContains(search)
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            SelectedSwitchCard(state: state)
+                .padding([.horizontal, .top], 16)
+
+            HStack(spacing: 8) {
+                HStack(spacing: 4) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundStyle(.secondary)
+                    TextField("Search switches", text: $search)
+                        .textFieldStyle(.plain)
+                    if !search.isEmpty {
+                        Button {
+                            search = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(6)
+                .background(.quaternary.opacity(0.5),
+                            in: RoundedRectangle(cornerRadius: 6))
+
+                Picker("", selection: $typeFilter) {
+                    ForEach(types, id: \.self) { Text($0) }
+                }
+                .labelsHidden()
+                .fixedSize()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+
+            Divider()
+
+            ScrollViewReader { proxy in
+                List {
+                    ForEach(filteredGroups, id: \.brand) { group in
+                        Section {
+                            ForEach(group.profiles) { profile in
+                                SwitchRow(profile: profile,
+                                          selected: state.profileID == profile.id,
+                                          select: {
+                                              state.profileID = profile.id
+                                              state.preview(profile)
+                                          },
+                                          preview: { state.preview(profile) })
+                                    .id(profile.id)
+                            }
+                        } header: {
+                            Text(group.brand)
+                        }
+                    }
+
+                    if filteredGroups.isEmpty {
+                        Text("No switches match.")
+                            .foregroundStyle(.secondary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.vertical, 12)
+                    }
+                }
+                .listStyle(.inset)
+                .frame(height: 240)
+                .onAppear { proxy.scrollTo(state.profileID, anchor: .center) }
+            }
+
+            Divider()
+
+            Form {
+                Section("Output") {
+                    LabeledContent("Volume") {
+                        Slider(value: $state.volume, in: 0...1.2) {
+                            EmptyView()
+                        } minimumValueLabel: {
+                            Image(systemName: "speaker.fill")
+                                .foregroundStyle(.secondary)
+                        } maximumValueLabel: {
+                            Image(systemName: "speaker.wave.3.fill")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    LabeledContent("Tone") {
+                        Slider(value: $state.tone, in: -1...1) {
+                            EmptyView()
+                        } minimumValueLabel: {
+                            Text("Dark").font(.caption)
+                        } maximumValueLabel: {
+                            Text("Bright").font(.caption)
+                        }
+                    }
+                    Toggle("Spatial audio (pan by key position)",
+                           isOn: $state.spatialAudio)
+                }
+            }
+            .formStyle(.grouped)
+            .scrollDisabled(true)
+            .frame(height: 190)
+        }
+    }
+}
+
+/// Always-visible summary of the active switch with a preview button, so the
+/// current choice never has to be hunted for in the list.
+private struct SelectedSwitchCard: View {
+    @ObservedObject var state: AppState
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "keyboard.fill")
+                .font(.title2)
+                .foregroundStyle(Color.accentColor)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(state.profileManager.profile(id: state.profileID)?.name
+                     ?? "No switch selected")
+                    .font(.headline)
+                if let profile = state.profileManager.profile(id: state.profileID) {
+                    Text("\(profile.brand) · \(profile.type.capitalized)")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Spacer()
+            if let profile = state.profileManager.profile(id: state.profileID) {
+                Button {
+                    state.preview(profile)
+                } label: {
+                    Label("Preview", systemImage: "play.fill")
+                }
+            }
+        }
+        .padding(12)
+        .background(.quaternary.opacity(0.4),
+                    in: RoundedRectangle(cornerRadius: 10))
+    }
+}
+
+private struct SwitchRow: View {
+    let profile: Profile
+    let selected: Bool
+    let select: () -> Void
+    let preview: () -> Void
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                .foregroundStyle(selected ? AnyShapeStyle(Color.accentColor)
+                                          : AnyShapeStyle(.quaternary))
+            Text(profile.name)
+            Text(profile.type.capitalized)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 6)
+                .padding(.vertical, 1)
+                .background(.quaternary.opacity(0.5), in: Capsule())
+            Spacer()
+            Button(action: preview) {
+                Image(systemName: "play.circle")
+            }
+            .buttonStyle(.borderless)
+            .help("Preview")
+        }
+        .contentShape(Rectangle())
+        .onTapGesture(perform: select)
     }
 }
 
