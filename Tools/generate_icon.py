@@ -16,8 +16,10 @@ from PIL import Image, ImageDraw
 
 CANVAS = 1024
 SS = 4  # supersample factor
-BLUE = (30, 136, 229)      # #1E88E5
-BLUE_DARK = (21, 101, 192)  # #1565C0
+# Graphite body — deviates from the Quiet Apps blue on user request.
+BODY_TOP = (42, 47, 56)     # #2A2F38 graphite
+BODY_BOTTOM = (11, 13, 17)  # #0B0D11 near-black
+ACCENT = (245, 158, 11)     # amber pressed key
 
 
 def superellipse_mask(size, n=5.0):
@@ -41,7 +43,7 @@ def build():
     grad = np.zeros((s, s, 4), dtype=np.uint8)
     t = np.linspace(0, 1, s)[:, None]
     for c in range(3):
-        grad[..., c] = ((1 - t) * BLUE[c] + t * BLUE_DARK[c]).astype(np.uint8)
+        grad[..., c] = ((1 - t) * BODY_TOP[c] + t * BODY_BOTTOM[c]).astype(np.uint8)
     grad[..., 3] = superellipse_mask(s)
     icon = Image.fromarray(grad, "RGBA")
 
@@ -63,7 +65,7 @@ def build():
             box = [x0, y0, x0 + key, y0 + key]
             if row == 0 and col == 1:
                 draw.rounded_rectangle(box, radius=radius,
-                                       fill=(255, 255, 255, 255))
+                                       fill=ACCENT + (255,))
             else:
                 draw.rounded_rectangle(box, radius=radius,
                                        outline=(255, 255, 255, 235),
