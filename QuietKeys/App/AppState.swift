@@ -10,31 +10,52 @@ final class AppState: ObservableObject {
     static let shared = AppState()
 
     // MARK: - Persisted settings
+    //
+    // Not @AppStorage: SwiftUI bindings write through the wrapper's projected
+    // value, which bypasses didSet — profile changes never reached the engine.
+    // @Published setters always run, so persist + apply happens in didSet.
 
-    @AppStorage("enabled") var enabled = true {
-        didSet { applyEnabled() }
+    @Published var enabled: Bool {
+        didSet { defaults.set(enabled, forKey: "enabled"); applyEnabled() }
     }
-    @AppStorage("profileID") var profileID = "gateron-ink-black" {
-        didSet { loadActiveProfile() }
+    @Published var profileID: String {
+        didSet { defaults.set(profileID, forKey: "profileID"); loadActiveProfile() }
     }
-    @AppStorage("volume") var volume = 0.8 {
-        didSet { engine.volume = Float(volume) }
+    @Published var volume: Double {
+        didSet { defaults.set(volume, forKey: "volume"); engine.volume = Float(volume) }
     }
-    @AppStorage("tone") var tone = 0.0 {
-        didSet { engine.configureTone(Float(tone)) }
+    @Published var tone: Double {
+        didSet { defaults.set(tone, forKey: "tone"); engine.configureTone(Float(tone)) }
     }
-    @AppStorage("spatialAudio") var spatialAudio = true
-    @AppStorage("mouseClicks") var mouseClicks = true
-    @AppStorage("releaseSounds") var releaseSounds = true
-    @AppStorage("repeatSounds") var repeatSounds = true
-    @AppStorage("visualizerEnabled") var visualizerEnabled = false {
-        didSet { visualizer.setEnabled(visualizerEnabled) }
+    @Published var spatialAudio: Bool {
+        didSet { defaults.set(spatialAudio, forKey: "spatialAudio") }
     }
-    @AppStorage("visualizerPosition") var visualizerPositionRaw =
-        VisualizerPosition.bottomCenter.rawValue {
-        didSet { visualizer.position = visualizerPosition }
+    @Published var mouseClicks: Bool {
+        didSet { defaults.set(mouseClicks, forKey: "mouseClicks") }
     }
-    @AppStorage("onboarded") var onboarded = false
+    @Published var releaseSounds: Bool {
+        didSet { defaults.set(releaseSounds, forKey: "releaseSounds") }
+    }
+    @Published var repeatSounds: Bool {
+        didSet { defaults.set(repeatSounds, forKey: "repeatSounds") }
+    }
+    @Published var visualizerEnabled: Bool {
+        didSet {
+            defaults.set(visualizerEnabled, forKey: "visualizerEnabled")
+            visualizer.setEnabled(visualizerEnabled)
+        }
+    }
+    @Published var visualizerPositionRaw: String {
+        didSet {
+            defaults.set(visualizerPositionRaw, forKey: "visualizerPosition")
+            visualizer.position = visualizerPosition
+        }
+    }
+    @Published var onboarded: Bool {
+        didSet { defaults.set(onboarded, forKey: "onboarded") }
+    }
+
+    private let defaults = UserDefaults.standard
 
     var visualizerPosition: VisualizerPosition {
         VisualizerPosition(rawValue: visualizerPositionRaw) ?? .bottomCenter
@@ -61,19 +82,39 @@ final class AppState: ObservableObject {
     private init() {
         // The tap thread reads settings straight from UserDefaults; without
         // registered defaults an unset key reads as false and mutes the app.
-        UserDefaults.standard.register(defaults: [
+        let defaults = UserDefaults.standard
+        defaults.register(defaults: [
             "enabled": true,
+            "profileID": "gateron-ink-black",
             "volume": 0.8,
             "tone": 0.0,
             "spatialAudio": true,
             "mouseClicks": true,
             "releaseSounds": true,
             "repeatSounds": true,
+            "visualizerEnabled": false,
+            "visualizerPosition": VisualizerPosition.bottomCenter.rawValue,
+            "onboarded": false,
         ])
+
+        // didSet does not fire during init — apply everything explicitly below.
+        enabled = defaults.bool(forKey: "enabled")
+        profileID = defaults.string(forKey: "profileID") ?? "gateron-ink-black"
+        volume = defaults.double(forKey: "volume")
+        tone = defaults.double(forKey: "tone")
+        spatialAudio = defaults.bool(forKey: "spatialAudio")
+        mouseClicks = defaults.bool(forKey: "mouseClicks")
+        releaseSounds = defaults.bool(forKey: "releaseSounds")
+        repeatSounds = defaults.bool(forKey: "repeatSounds")
+        visualizerEnabled = defaults.bool(forKey: "visualizerEnabled")
+        visualizerPositionRaw = defaults.string(forKey: "visualizerPosition")
+            ?? VisualizerPosition.bottomCenter.rawValue
+        onboarded = defaults.bool(forKey: "onboarded")
 
         engine.volume = Float(volume)
         engine.configureTone(Float(tone))
         visualizer.position = visualizerPosition
+        visualizer.setEnabled(visualizerEnabled)
 
         monitor.onKey = { [weak self] event in
             self?.handleKey(event)          // tap thread
