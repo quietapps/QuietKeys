@@ -82,9 +82,13 @@ struct MenuContent: View {
                 openWindow(id: "typing-test")
                 NSApp.activate(ignoringOtherApps: true)
             }
-            MenuRow(title: "Settings…", systemImage: "gearshape",
-                    shortcut: "⌘,") {
-                SettingsOpener.open()
+            if #available(macOS 14.0, *) {
+                SettingsMenuRow()
+            } else {
+                MenuRow(title: "Settings…", systemImage: "gearshape",
+                        shortcut: "⌘,") {
+                    SettingsOpener.open()
+                }
             }
             MenuRow(title: "Quit Quiet Keys", systemImage: "power",
                     shortcut: "⌘Q") {
@@ -105,15 +109,23 @@ struct MenuContent: View {
     }
 }
 
-/// Opens the SwiftUI Settings scene on macOS 13 and 14+ alike.
+/// macOS 14+: the supported way to open the Settings scene.
+@available(macOS 14.0, *)
+private struct SettingsMenuRow: View {
+    @Environment(\.openSettings) private var openSettings
+
+    var body: some View {
+        MenuRow(title: "Settings…", systemImage: "gearshape", shortcut: "⌘,") {
+            NSApp.activate(ignoringOtherApps: true)
+            openSettings()
+        }
+    }
+}
+
+/// macOS 13 fallback: the legacy responder-chain selector.
 enum SettingsOpener {
     static func open() {
         NSApp.activate(ignoringOtherApps: true)
-        // macOS 14+
-        if NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil) {
-            return
-        }
-        // macOS 13
         NSApp.sendAction(Selector(("showPreferencesWindow:")), to: nil, from: nil)
     }
 }
