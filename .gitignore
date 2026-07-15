@@ -1,0 +1,17 @@
+# Xcode
+QuietKeys.xcodeproj/
+DerivedData/
+build/
+dist/
+*.xcuserstate
+xcuserdata/
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# local agent config
+.claude/

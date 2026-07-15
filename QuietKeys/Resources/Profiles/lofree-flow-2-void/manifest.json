@@ -1,0 +1,61 @@
+{
+  "id": "lofree-flow-2-void",
+  "name": "Flow 2 Void",
+  "brand": "Lofree",
+  "type": "linear",
+  "gain": 1.0,
+  "keys": {
+    "default": {
+      "down": [
+        "default_down_1.wav",
+        "default_down_2.wav",
+        "default_down_3.wav",
+        "default_down_4.wav"
+      ],
+      "up": [
+        "default_up_1.wav",
+        "default_up_2.wav",
+        "default_up_3.wav"
+      ]
+    },
+    "space": {
+      "down": [
+        "space_down_1.wav",
+        "space_down_2.wav",
+        "space_down_3.wav",
+        "space_down_4.wav"
+      ],
+      "up": [
+        "space_up_1.wav",
+        "space_up_2.wav",
+        "space_up_3.wav"
+      ]
+    },
+    "return": {
+      "down": [
+        "return_down_1.wav",
+        "return_down_2.wav",
+        "return_down_3.wav",
+        "return_down_4.wav"
+      ],
+      "up": [
+        "return_up_1.wav",
+        "return_up_2.wav",
+        "return_up_3.wav"
+      ]
+    },
+    "delete": {
+      "down": [
+        "delete_down_1.wav",
+        "delete_down_2.wav",
+        "delete_down_3.wav",
+        "delete_down_4.wav"
+      ],
+      "up": [
+        "delete_up_1.wav",
+        "delete_up_2.wav",
+        "delete_up_3.wav"
+      ]
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "id": "_mouse",
+  "buttons": {
+    "mouse_left": {
+      "down": [
+        "mouse_left_1.wav",
+        "mouse_left_2.wav"
+      ],
+      "up": [
+        "mouse_left_up_1.wav",
+        "mouse_left_up_2.wav"
+      ]
+    },
+    "mouse_right": {
+      "down": [
+        "mouse_right_1.wav",
+        "mouse_right_2.wav"
+      ],
+      "up": [
+        "mouse_right_up_1.wav",
+        "mouse_right_up_2.wav"
+      ]
+    },
+    "mouse_middle": {
+      "down": [
+        "mouse_middle_1.wav",
+        "mouse_middle_2.wav"
+      ],
+      "up": [
+        "mouse_middle_up_1.wav",
+        "mouse_middle_up_2.wav"
+      ]
+    }
+  }
+}

@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>quiet keys — your keyboard, but better</title>
+<meta name="description" content="Mechanical keyboard sounds for every keystroke on your Mac. Free, open source, fully offline.">
+<link rel="icon" href="icon.png">
+<style>
+  :root {
+    --blue: #1E88E5; --blue-600: #1565C0; --blue-100: #E6F2FC;
+    --ink: #0E1116; --fg-2: #3A4049; --fg-3: #6C737E;
+    --line: #E4E6EA; --bg-1: #FFFFFF; --bg-2: #F7F8FA; --bg-3: #EEF0F3;
+    --dark-1: #0B0D11; --dark-2: #16191F; --dark-line: #2A2F38;
+    --on-dark: #F2F3F5; --on-dark-2: #B8BDC6;
+    --r-md: 10px; --r-lg: 14px; --r-xl: 20px;
+    --shadow-1: 0 1px 2px rgba(14,17,22,.05), 0 0 0 1px rgba(14,17,22,.04);
+    --shadow-3: 0 8px 24px rgba(14,17,22,.10), 0 0 0 1px rgba(14,17,22,.04);
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+    --mono: 'SF Mono', ui-monospace, Menlo, monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font); color: var(--ink); background: var(--bg-2);
+         font-size: 15px; line-height: 1.45; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  header { padding: 20px 0; }
+  header .wrap { display: flex; align-items: center; gap: 10px; }
+  header img { width: 28px; height: 28px; }
+  header .brand { font-weight: 700; letter-spacing: -0.01em; }
+  header nav { margin-left: auto; display: flex; gap: 20px; font-size: 13px; }
+  header nav a { color: var(--fg-2); }
+
+  .hero { padding: 72px 0 56px; text-align: center; }
+  .hero h1 { font-size: clamp(38px, 7vw, 76px); font-weight: 700;
+             letter-spacing: -0.02em; line-height: 1.05; }
+  .hero p.sub { margin: 20px auto 0; max-width: 560px; font-size: 17px; color: var(--fg-2); }
+  .cta-row { margin-top: 32px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px;
+         border-radius: var(--r-md); font-weight: 500; font-size: 15px;
+         transition: background 120ms var(--ease); }
+  .btn-primary { background: var(--blue); color: #fff; }
+  .btn-primary:hover { background: var(--blue-600); text-decoration: none; }
+  .btn-ghost { background: var(--bg-1); color: var(--ink); box-shadow: var(--shadow-1); }
+  .btn-ghost:hover { background: var(--bg-3); text-decoration: none; }
+  .hero .meta { margin-top: 16px; font-size: 12px; color: var(--fg-3); }
+
+  section { padding: 64px 0; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em;
+             text-transform: uppercase; color: var(--fg-3); }
+  h2 { font-size: clamp(26px, 4vw, 38px); font-weight: 700; letter-spacing: -0.02em;
+       margin-top: 8px; }
+  .lead { margin-top: 12px; max-width: 620px; color: var(--fg-2); }
+
+  /* menu bar showcase */
+  .showcase { display: flex; justify-content: center; margin-top: 36px; }
+  .menupanel { width: 300px; background: var(--bg-1); border-radius: var(--r-lg);
+               box-shadow: var(--shadow-3); padding: 12px 0; font-size: 13px; }
+  .menupanel .sec { padding: 4px 14px; font-size: 10px; font-weight: 600;
+                    letter-spacing: 0.08em; color: var(--fg-3); text-transform: uppercase; }
+  .menupanel .row { display: flex; align-items: center; gap: 10px; padding: 7px 14px;
+                    color: var(--ink); }
+  .menupanel .row svg { width: 16px; height: 16px; color: var(--fg-3); flex: none; }
+  .menupanel .row .grow { flex: 1; }
+  .menupanel hr { border: 0; border-top: 1px solid var(--line); margin: 6px 0; }
+  .menupanel .kbd { font-family: var(--mono); font-size: 11px; color: var(--fg-3); }
+  .switchpill { background: var(--bg-3); border-radius: 6px; padding: 2px 8px;
+                font-size: 12px; color: var(--fg-2); }
+  .toggle { width: 34px; height: 20px; border-radius: 999px; background: var(--blue);
+            position: relative; flex: none; }
+  .toggle::after { content: ""; position: absolute; top: 2px; right: 2px;
+                   width: 16px; height: 16px; border-radius: 50%; background: #fff;
+                   box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  .toggle.off { background: var(--line); }
+  .toggle.off::after { right: auto; left: 2px; }
+  .slider { flex: 1; height: 4px; border-radius: 2px; background: var(--bg-3);
+            position: relative; }
+  .slider::after { content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+                   width: 65%; background: var(--blue); border-radius: 2px; }
+
+  /* features */
+  .grid { margin-top: 36px; display: grid; gap: 16px;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .card { background: var(--bg-1); border-radius: var(--r-lg); box-shadow: var(--shadow-1);
+          padding: 24px; transition: box-shadow 120ms var(--ease); }
+  .card:hover { box-shadow: var(--shadow-3); }
+  .card svg { width: 22px; height: 22px; color: var(--blue); }
+  .card h3 { font-size: 17px; font-weight: 600; margin-top: 12px; }
+  .card p { margin-top: 6px; font-size: 13px; color: var(--fg-2); }
+
+  /* demo */
+  .demo { background: var(--dark-1); color: var(--on-dark); border-radius: var(--r-xl);
+          padding: 32px; margin-top: 36px; }
+  .demo-controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .demo select { background: var(--dark-2); color: var(--on-dark); border: 1px solid var(--dark-line);
+                 border-radius: var(--r-md); padding: 8px 12px; font-size: 14px; font-family: var(--font); }
+  .demo button { background: var(--dark-2); color: var(--on-dark); border: 1px solid var(--dark-line);
+                 border-radius: var(--r-md); padding: 8px 16px; font-size: 14px; cursor: pointer;
+                 font-family: var(--font); }
+  .demo button:hover { background: var(--dark-line); }
+  .stats { display: flex; gap: 32px; margin: 20px 0; }
+  .stat .label { font-size: 10px; font-weight: 600; letter-spacing: 0.08em;
+                 text-transform: uppercase; color: var(--on-dark-2); }
+  .stat .value { font-family: var(--mono); font-size: 24px; font-weight: 600;
+                 font-variant-numeric: tabular-nums; }
+  #prompt { font-family: var(--mono); font-size: 15px; line-height: 1.7;
+            padding: 16px; background: var(--dark-2); border-radius: var(--r-md);
+            border: 1px solid var(--dark-line); min-height: 76px; cursor: text; }
+  #prompt .ok { color: #5CC489; }
+  #prompt .bad { color: #E5645A; text-decoration: underline; }
+  #prompt .cursor { border-left: 2px solid var(--blue); animation: blink 1s step-end infinite; }
+  #prompt .rest { color: var(--on-dark-2); }
+  @keyframes blink { 50% { border-color: transparent; } }
+  .demo .hint { font-size: 12px; color: var(--on-dark-2); margin-top: 10px; }
+  #kbd { margin-top: 20px; display: flex; flex-direction: column; gap: 4px; }
+  #kbd .krow { display: flex; gap: 4px; }
+  #kbd .key { height: 34px; border-radius: 5px; background: rgba(255,255,255,.08);
+              color: var(--on-dark-2); font-size: 10px; display: flex; align-items: center;
+              justify-content: center; transition: background 120ms var(--ease),
+              color 120ms var(--ease); overflow: hidden; }
+  #kbd .key.lit { background: var(--blue); color: #fff; }
+
+  /* video */
+  .video-slot { margin-top: 36px; aspect-ratio: 16 / 9; border-radius: var(--r-xl);
+                background: var(--dark-1); display: flex; align-items: center;
+                justify-content: center; flex-direction: column; gap: 12px;
+                color: var(--on-dark-2); box-shadow: var(--shadow-3); }
+  .video-slot svg { width: 48px; height: 48px; color: var(--blue); }
+
+  footer { padding: 48px 0 64px; border-top: 1px solid var(--line); margin-top: 32px;
+           font-size: 13px; color: var(--fg-3); }
+  footer .wrap { display: flex; gap: 24px; flex-wrap: wrap; align-items: center; }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <img src="icon.png" alt="">
+    <span class="brand">quiet keys</span>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#demo">Try it</a>
+      <a href="https://github.com/quietapps/QuietKeys">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>Your keyboard,<br>but better.</h1>
+    <p class="sub">Quiet Keys plays a real mechanical switch sound for every key you press, in any app. 22 switch profiles, spatial audio, and nothing leaves your Mac.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://github.com/quietapps/QuietKeys/releases/latest">Download for macOS</a>
+      <a class="btn btn-ghost" href="https://github.com/quietapps/QuietKeys">View source</a>
+    </div>
+    <p class="meta">Free · MIT licensed · macOS 13+ · no account, no network, no tracking</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">One click away</p>
+    <h2>Everything lives in the menu bar</h2>
+    <p class="lead">Pick a switch, set the tone, toggle the visualizer. No windows to manage — Quiet Keys hides until you want it.</p>
+    <div class="showcase">
+      <div class="menupanel" aria-hidden="true">
+        <div class="sec">Control</div>
+        <div class="row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h0M10 10h0M14 10h0M18 10h0M8 14h8"/></svg>
+          <span class="grow">Enable Quiet Keys</span><span class="toggle"></span>
+        </div>
+        <hr>
+        <div class="sec">Sound</div>
+        <div class="row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h2v2H7zM11 9h2v2h-2zM15 9h2v2h-2zM8 15h8"/></svg>
+          <span class="grow">Switches</span><span class="switchpill">Gateron Ink Black</span>
+        </div>
+        <div class="row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+          <span class="grow">Volume</span><span class="slider" style="max-width:110px"></span>
+        </div>
+        <hr>
+        <div class="row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="10" rx="2"/><path d="M7 12h0M11 12h0M15 12h0"/></svg>
+          <span class="grow">Enable Visualizer</span><span class="toggle off"></span>
+        </div>
+        <hr>
+        <div class="sec">App</div>
+        <div class="row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span class="grow">Settings…</span><span class="kbd">⌘,</span>
+        </div>
+        <div class="row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><path d="M12 2v10"/></svg>
+          <span class="grow">Quit Quiet Keys</span><span class="kbd">⌘Q</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <p class="eyebrow">Why it feels right</p>
+    <h2>Small app. Serious sound.</h2>
+    <div class="grid">
+      <div class="card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>
+        <h3>Spatial audio</h3>
+        <p>Keys on the left half of your keyboard play from the left speaker, keys on the right from the right. Your desk becomes the soundstage.</p>
+      </div>
+      <div class="card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="12" rx="2"/><path d="M6 11h2v2H6zM11 11h2v2h-2zM16 11h2v2h-2z"/></svg>
+        <h3>Reactive visualizer</h3>
+        <p>A floating mini keyboard lights up every key as you press it. Pin it to a corner or let it follow your cursor.</p>
+      </div>
+      <div class="card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <h3>Low latency</h3>
+        <p>A lock-free audio engine with a 128-frame buffer. The sound lands the instant the key does — around three milliseconds.</p>
+      </div>
+      <div class="card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7v6a7 7 0 0 0 14 0V9a7 7 0 0 0-7-7z"/><path d="M12 6v4"/></svg>
+        <h3>Mouse click sounds</h3>
+        <p>Distinct, satisfying clicks for left, right, and middle buttons. Toggle them off any time.</p>
+      </div>
+      <div class="card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <h3>Completely private</h3>
+        <p>No data collected, no accounts, no network access, no telemetry. Keystrokes are matched to a sound and forgotten. Open source — audit every line.</p>
+      </div>
+      <div class="card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        <h3>22 switch profiles</h3>
+        <p>Gateron inks, Holy Pandas, Box Navies, buckling springs, Topre domes — and a lizard. Adding your own is a drop-in folder.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap">
+    <p class="eyebrow">Type to hear</p>
+    <h2>Try it right here</h2>
+    <p class="lead">Pick a switch and type the line below. Sounds pan with key position — use headphones or stereo speakers.</p>
+    <div class="demo">
+      <div class="demo-controls">
+        <label for="switchsel" style="font-size:13px;color:var(--on-dark-2)">Switch</label>
+        <select id="switchsel">
+          <option value="gateron-ink-black">Gateron Ink Black</option>
+          <option value="kailh-box-navy">Kailh Box Navy</option>
+          <option value="ibm-buckling-spring">IBM Buckling Spring</option>
+          <option value="topre-classic">Topre Classic</option>
+          <option value="novelkeys-cream">NovelKeys Cream</option>
+          <option value="quirky-lizard">Lizard</option>
+        </select>
+        <button id="restart">Restart</button>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="label">WPM</div><div class="value" id="wpm">—</div></div>
+        <div class="stat"><div class="label">Accuracy</div><div class="value" id="acc">—</div></div>
+        <div class="stat"><div class="label">Time</div><div class="value" id="time">0:00</div></div>
+      </div>
+      <div id="prompt" tabindex="0"></div>
+      <p class="hint">Click the line and start typing. Backspace works.</p>
+      <div id="kbd" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <p class="eyebrow">See it in action</p>
+    <h2>Thirty seconds of thock</h2>
+    <a class="video-slot" href="https://github.com/quietapps/QuietKeys#readme" aria-label="Watch the demo on GitHub">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m10 8 6 4-6 4V8z"/></svg>
+      <span>Watch the demo</span>
+    </a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>quiet keys · MIT licensed · a quiet apps project</span>
+    <a href="https://github.com/quietapps/QuietKeys">Source</a>
+    <a href="https://github.com/quietapps/QuietKeys/issues">Report a bug or share an idea</a>
+    <span style="margin-left:auto">No cookies, no analytics — this page collects nothing.</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  // ── audio ────────────────────────────────────────────────────────────
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const banks = {};   // profile -> {down: [AudioBuffer], up: [...], space, enter}
+  let active = 'gateron-ink-black';
+
+  async function loadBank(id) {
+    if (banks[id]) return banks[id];
+    const files = {
+      down:  [1,2,3,4].map(i => `samples/${id}/default_down_${i}.wav`),
+      up:    [1,2,3].map(i => `samples/${id}/default_up_${i}.wav`),
+      space: [`samples/${id}/space_down_1.wav`],
+      enter: [`samples/${id}/return_down_1.wav`],
+    };
+    const bank = {};
+    for (const [k, urls] of Object.entries(files)) {
+      bank[k] = await Promise.all(urls.map(async u => {
+        const r = await fetch(u);
+        return ctx.decodeAudioData(await r.arrayBuffer());
+      }));
+    }
+    banks[id] = bank;
+    return bank;
+  }
+
+  const rr = {};
+  function play(kind, pan) {
+    const bank = banks[active];
+    if (!bank) return;
+    const pool = bank[kind] || bank.down;
+    rr[kind] = ((rr[kind] || 0) + 1) % pool.length;
+    const src = ctx.createBufferSource();
+    src.buffer = pool[rr[kind]];
+    const p = ctx.createStereoPanner();
+    p.pan.value = pan || 0;
+    const g = ctx.createGain();
+    g.gain.value = kind === 'up' ? 0.7 : 1;
+    src.connect(g).connect(p).connect(ctx.destination);
+    src.start();
+  }
+
+  // key → horizontal position (-1 … 1) for spatial pan
+  const rows = ["`1234567890-=", "qwertyuiop[]\\", "asdfghjkl;'", "zxcvbnm,./"];
+  const panOf = ch => {
+    ch = ch.toLowerCase();
+    for (const row of rows) {
+      const i = row.indexOf(ch);
+      if (i >= 0) return ((i / (row.length - 1)) - 0.5) * 1.4;
+    }
+    return 0;
+  };
+
+  // ── mini keyboard ────────────────────────────────────────────────────
+  const KBD_ROWS = [
+    [["`",1],["1",1],["2",1],["3",1],["4",1],["5",1],["6",1],["7",1],["8",1],["9",1],["0",1],["-",1],["=",1],["⌫",1.75]],
+    [["tab",1.5],["Q",1],["W",1],["E",1],["R",1],["T",1],["Y",1],["U",1],["I",1],["O",1],["P",1],["[",1],["]",1],["\\",1.25]],
+    [["caps",1.75],["A",1],["S",1],["D",1],["F",1],["G",1],["H",1],["J",1],["K",1],["L",1],[";",1],["'",1],["↵",2]],
+    [["shift",2.25],["Z",1],["X",1],["C",1],["V",1],["B",1],["N",1],["M",1],[",",1],[".",1],["/",1],["shift",2.5]],
+    [["⌃",1.25],["⌥",1.25],["⌘",1.5],["␣",6.25],["⌘",1.5],["⌥",1.25],["⌃",1.25]],
+  ];
+  const kbd = document.getElementById('kbd');
+  const keyEls = {};
+  KBD_ROWS.forEach(row => {
+    const div = document.createElement('div');
+    div.className = 'krow';
+    const units = row.reduce((s, k) => s + k[1], 0);
+    row.forEach(([label, w]) => {
+      const el = document.createElement('div');
+      el.className = 'key';
+      el.textContent = label;
+      el.style.flex = `${w} 0 0`;
+      el.style.minWidth = 0;
+      div.appendChild(el);
+      const key = label.length === 1 ? label.toLowerCase() : label;
+      (keyEls[key] = keyEls[key] || []).push(el);
+    });
+    kbd.appendChild(div);
+  });
+  const mapKey = e => {
+    if (e.key === ' ') return '␣';
+    if (e.key === 'Enter') return '↵';
+    if (e.key === 'Backspace') return '⌫';
+    if (e.key === 'Shift') return 'shift';
+    if (e.key === 'Meta') return '⌘';
+    if (e.key === 'Alt') return '⌥';
+    if (e.key === 'Control') return '⌃';
+    if (e.key === 'Tab') return 'tab';
+    if (e.key === 'CapsLock') return 'caps';
+    return e.key.toLowerCase();
+  };
+  const light = (e, on) =>
+    (keyEls[mapKey(e)] || []).forEach(el => el.classList.toggle('lit', on));
+
+  // ── typing test ──────────────────────────────────────────────────────
+  const PROMPTS = [
+    "The quick brown fox jumps over the lazy dog while the rain settles quietly on the window.",
+    "Good tools disappear into the work. You notice them only when they are gone.",
+    "Typing should feel like something. Every key down, a small satisfying answer back.",
+  ];
+  let prompt = PROMPTS[0], typed = "", started = null, finished = null, errors = 0;
+  const $ = id => document.getElementById(id);
+
+  function render() {
+    const el = $('prompt');
+    el.innerHTML = "";
+    [...prompt].forEach((ch, i) => {
+      const s = document.createElement('span');
+      s.textContent = ch;
+      if (i < typed.length) s.className = typed[i] === ch ? 'ok' : 'bad';
+      else if (i === typed.length) s.className = 'cursor rest';
+      else s.className = 'rest';
+      el.appendChild(s);
+    });
+    const secs = started ? (((finished || Date.now()) - started) / 1000) : 0;
+    $('time').textContent = `${Math.floor(secs / 60)}:${String(Math.floor(secs % 60)).padStart(2, '0')}`;
+    $('wpm').textContent = secs > 1 ? Math.round((typed.length / 5) / (secs / 60)) : '—';
+    $('acc').textContent = typed.length
+      ? Math.min(100, Math.round(100 * typed.length / (typed.length + errors))) + '%' : '—';
+  }
+  setInterval(() => { if (started && !finished) render(); }, 250);
+
+  function restart() {
+    prompt = PROMPTS[Math.floor(Math.random() * PROMPTS.length)];
+    typed = ""; started = null; finished = null; errors = 0;
+    render();
+    $('prompt').focus();
+  }
+  $('restart').addEventListener('click', restart);
+
+  const promptEl = $('prompt');
+  promptEl.addEventListener('keydown', async e => {
+    if (e.metaKey || e.ctrlKey) return;
+    e.preventDefault();
+    if (ctx.state === 'suspended') ctx.resume();
+    await loadBank(active);
+    light(e, true);
+
+    if (e.key === 'Backspace') {
+      play('down', -0.6);
+      typed = typed.slice(0, -1);
+      if (finished) finished = null;
+    } else if (e.key === 'Enter') {
+      play('enter', 0.5);
+    } else if (e.key.length === 1 && !finished) {
+      play(e.key === ' ' ? 'space' : 'down', panOf(e.key));
+      if (!started) started = Date.now();
+      if (e.key !== prompt[typed.length]) errors++;
+      typed += e.key;
+      if (typed.length >= prompt.length) finished = Date.now();
+    } else {
+      return render();
+    }
+    render();
+  });
+  promptEl.addEventListener('keyup', e => light(e, false));
+
+  document.getElementById('switchsel').addEventListener('change', async e => {
+    active = e.target.value;
+    await loadBank(active);
+    play('down', -0.3); setTimeout(() => play('down', 0.3), 130);
+    promptEl.focus();
+  });
+
+  loadBank(active);
+  render();
+})();
+</script>
+</body>
+</html>
