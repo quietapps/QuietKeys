@@ -5,8 +5,7 @@ cask "quietkeys" do
   version "1.0.1"
   sha256 "1abc0c20b96341bf7df57a6383b33ca6016772cf01271d02c1b7562f9bddb158"
 
-  url "https://github.com/quietapps/QuietKeys/releases/download/#{version}/QuietKeys-#{version}.zip",
-      verified: "github.com/quietapps/QuietKeys/"
+  url "https://github.com/quietapps/QuietKeys/releases/download/#{version}/QuietKeys-#{version}.zip"
   name "Quiet Keys"
   desc "Mechanical keyboard sounds for every keystroke — free, offline, open source"
   homepage "https://github.com/quietapps/QuietKeys"
