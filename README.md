@@ -277,8 +277,6 @@ xcrun notarytool submit QuietKeys.dmg --keychain-profile notary --wait
 xcrun stapler staple QuietKeys.dmg
 ```
 
-CI (`.github/workflows/release.yml`) builds every push and, when signing secrets are configured, produces a signed + notarized `.dmg` on tagged releases. Required repo secrets: `MACOS_CERTIFICATE_P12`, `MACOS_CERTIFICATE_PASSWORD`, `NOTARY_APPLE_ID`, `NOTARY_TEAM_ID`, `NOTARY_PASSWORD`.
-
 ### Project layout
 
 ```

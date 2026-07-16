@@ -281,6 +281,16 @@ private struct VisualizerSettings: View {
                 }
             }
             .disabled(!state.visualizerEnabled)
+            Toggle("Show key labels", isOn: $state.visualizerLabels)
+                .disabled(!state.visualizerEnabled)
+            LabeledContent {
+                Button("Reset position and size") {
+                    state.visualizer.resetLayout()
+                }
+                .disabled(!state.visualizerEnabled)
+            } label: {
+                Text("Drag the visualizer to move it; drag the corner handle to resize.")
+            }
             Text("A small on-screen keyboard lights up keys as you type. It never captures your input — it only mirrors what you press.")
                 .font(.caption)
                 .foregroundStyle(.secondary)

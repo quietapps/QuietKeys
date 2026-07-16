@@ -48,7 +48,13 @@ final class AppState: ObservableObject {
     @Published var visualizerPositionRaw: String {
         didSet {
             defaults.set(visualizerPositionRaw, forKey: "visualizerPosition")
-            visualizer.position = visualizerPosition
+            visualizer.setPosition(visualizerPosition)
+        }
+    }
+    @Published var visualizerLabels: Bool {
+        didSet {
+            defaults.set(visualizerLabels, forKey: "visualizerLabels")
+            visualizer.showLabels = visualizerLabels
         }
     }
     @Published var onboarded: Bool {
@@ -94,6 +100,8 @@ final class AppState: ObservableObject {
             "repeatSounds": true,
             "visualizerEnabled": false,
             "visualizerPosition": VisualizerPosition.bottomCenter.rawValue,
+            "visualizerLabels": false,
+            "visualizerScale": 1.0,
             "onboarded": false,
         ])
 
@@ -109,11 +117,13 @@ final class AppState: ObservableObject {
         visualizerEnabled = defaults.bool(forKey: "visualizerEnabled")
         visualizerPositionRaw = defaults.string(forKey: "visualizerPosition")
             ?? VisualizerPosition.bottomCenter.rawValue
+        visualizerLabels = defaults.bool(forKey: "visualizerLabels")
         onboarded = defaults.bool(forKey: "onboarded")
 
         engine.volume = Float(volume)
         engine.configureTone(Float(tone))
         visualizer.position = visualizerPosition
+        visualizer.showLabels = visualizerLabels
         visualizer.setEnabled(visualizerEnabled)
 
         monitor.onKey = { [weak self] event in
