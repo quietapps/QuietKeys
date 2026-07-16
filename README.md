@@ -30,7 +30,7 @@ Quiet Keys lives in your menu bar and plays a realistic switch sound for every k
 
 ## Features
 
-**Current release:** version **1.0.1**, build **2** — see [CHANGELOG](CHANGELOG.md) for per-build notes
+**Current release:** version **1.0.2**, build **3** — see [CHANGELOG](CHANGELOG.md) for per-build notes
 
 ### Sound
 
@@ -43,7 +43,8 @@ Quiet Keys lives in your menu bar and plays a realistic switch sound for every k
 
 ### Visualizer & typing test
 
-- **Reactive visualizer** — a floating mini keyboard that lights up keys as you press them; follow-cursor or fixed screen positions
+- **Reactive visualizer** — a floating mini keyboard that lights up keys as you press them; follow-cursor or fixed screen positions, optional key labels
+- **Move, resize, close in place** — hover the visualizer to drag it anywhere, scale it up to 2.5× from the corner handle, or dismiss it with the ⨯; stays fully click-through otherwise
 - **Typing test** — built-in demo window with WPM, accuracy, and timer, plus a rendered keyboard that highlights every key
 
 ### Native macOS feel

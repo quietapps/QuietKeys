@@ -174,25 +174,47 @@ final class VisualizerController: ObservableObject {
     }
 
     // MARK: - Drag / resize / reset
+    //
+    // Both gestures work from the absolute screen mouse position, never the
+    // SwiftUI gesture translation: the translation is measured in the view's
+    // own coordinate space, which moves/scales with the panel every frame —
+    // a feedback loop that jitters.
 
-    /// Move the panel by a drag delta (SwiftUI coords: +y is down).
-    func dragBy(dx: CGFloat, dy: CGFloat) {
+    /// Mouse-to-origin offset captured on the first drag callback.
+    private var dragGrabOffset: NSPoint?
+
+    func dragMoved() {
         guard let panel else { return }
-        var origin = panel.frame.origin
-        origin.x += dx
-        origin.y -= dy
-        panel.setFrameOrigin(origin)
+        let mouse = NSEvent.mouseLocation
+        if dragGrabOffset == nil {
+            dragGrabOffset = NSPoint(x: mouse.x - panel.frame.origin.x,
+                                     y: mouse.y - panel.frame.origin.y)
+        }
+        guard let offset = dragGrabOffset else { return }
+        panel.setFrameOrigin(NSPoint(x: mouse.x - offset.x,
+                                     y: mouse.y - offset.y))
     }
 
     func dragEnded() {
+        dragGrabOffset = nil
         guard let panel else { return }
         setCustomOrigin(panel.frame.origin)
     }
 
+    /// Panel width and mouse x captured on the first resize callback.
+    private var resizeStart: (width: CGFloat, mouseX: CGFloat)?
+
     /// Resize from the bottom-right handle, keeping the top-left corner
-    /// fixed. `proposedWidth` comes from the gesture; aspect is locked.
-    func resizeTo(proposedWidth: CGFloat) {
+    /// fixed. Aspect is locked.
+    func resizeMoved() {
         guard let panel else { return }
+        resizing = true
+        let mouse = NSEvent.mouseLocation
+        if resizeStart == nil {
+            resizeStart = (panel.frame.width, mouse.x)
+        }
+        guard let start = resizeStart else { return }
+        let proposedWidth = start.width + (mouse.x - start.mouseX)
         let newScale = max(1, min(Self.maxScale,
                                   proposedWidth / Self.baseSize.width))
         guard abs(newScale - scale) > 0.001 else { return }
@@ -209,6 +231,7 @@ final class VisualizerController: ObservableObject {
 
     func resizeEnded() {
         resizing = false
+        resizeStart = nil
         UserDefaults.standard.set(Double(scale), forKey: "visualizerScale")
         guard let panel else { return }
         setCustomOrigin(panel.frame.origin)
@@ -286,11 +309,8 @@ final class VisualizerController: ObservableObject {
 struct MiniKeyboardView: View {
     @EnvironmentObject var controller: VisualizerController
 
-    @State private var lastDrag: CGSize = .zero
-    @State private var resizeStartWidth: CGFloat?
-
     var body: some View {
-        GeometryReader { geo in
+        GeometryReader { _ in
             KeyboardShapeView(pressedKeys: controller.pressedKeys,
                               keySpacing: 2.5,
                               cornerRadius: 3,
@@ -327,7 +347,7 @@ struct MiniKeyboardView: View {
                             .frame(width: 16, height: 16)
                             .background(.white.opacity(0.18), in: Circle())
                             .padding(5)
-                            .gesture(resizeGesture(panelWidth: geo.size.width))
+                            .gesture(resizeGesture)
                             .help("Drag to resize")
                             .transition(.opacity)
                     }
@@ -339,30 +359,14 @@ struct MiniKeyboardView: View {
 
     private var moveGesture: some Gesture {
         DragGesture(minimumDistance: 2)
-            .onChanged { value in
-                controller.dragBy(dx: value.translation.width - lastDrag.width,
-                                  dy: value.translation.height - lastDrag.height)
-                lastDrag = value.translation
-            }
-            .onEnded { _ in
-                lastDrag = .zero
-                controller.dragEnded()
-            }
+            .onChanged { _ in controller.dragMoved() }
+            .onEnded { _ in controller.dragEnded() }
     }
 
-    private func resizeGesture(panelWidth: CGFloat) -> some Gesture {
+    private var resizeGesture: some Gesture {
         DragGesture(minimumDistance: 1)
-            .onChanged { value in
-                controller.resizing = true
-                let start = resizeStartWidth ?? panelWidth
-                resizeStartWidth = start
-                controller.resizeTo(
-                    proposedWidth: start + value.translation.width)
-            }
-            .onEnded { _ in
-                resizeStartWidth = nil
-                controller.resizeEnded()
-            }
+            .onChanged { _ in controller.resizeMoved() }
+            .onEnded { _ in controller.resizeEnded() }
     }
 }
 

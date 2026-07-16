@@ -2,8 +2,8 @@
 # Lives in the quietapps/homebrew-quietkeys repository as Casks/quietkeys.rb;
 # kept here as the template updated on each release.
 cask "quietkeys" do
-  version "1.0.1"
-  sha256 "1abc0c20b96341bf7df57a6383b33ca6016772cf01271d02c1b7562f9bddb158"
+  version "1.0.2"
+  sha256 "16e36d60580637107bd33776bf99a1fdfbedba05fa070f0200bd1d940a9662d8"
 
   url "https://github.com/quietapps/QuietKeys/releases/download/#{version}/QuietKeys-#{version}.zip"
   name "Quiet Keys"

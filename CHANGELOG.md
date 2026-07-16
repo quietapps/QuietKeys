@@ -6,6 +6,24 @@ Format: version **X.Y.Z**, build **N** — newest first.
 
 ---
 
+## 1.0.2 — build 3 (2026-07-16)
+
+Visualizer grows up: labels, drag, resize.
+
+### Added
+
+- **Close button** — hover the visualizer and a small ⨯ appears in the top-right corner; click to hide it without opening the menu
+- **Key labels** — optional legends on the mini keyboard (Settings → Visualizer → *Show key labels*)
+- **Drag to move** — hover, then drag the visualizer anywhere; the position is remembered across launches. Picking a Position preset clears the custom spot
+- **Drag to resize** — a corner handle scales the visualizer from its default size up to 2.5×, aspect locked; persists across launches
+- **Reset position and size** — one button in Settings → Visualizer restores the defaults
+
+### Notes
+
+- The visualizer stays fully click-through until the cursor is over it, so it never steals clicks while you work
+
+---
+
 ## 1.0.1 — build 2 (2026-07-16)
 
 Sounds survive sleep and the lock screen.
