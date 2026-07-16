@@ -30,7 +30,7 @@ Quiet Keys lives in your menu bar and plays a realistic switch sound for every k
 
 ## Features
 
-**Current release:** version **1.0.0**, build **1** — see [CHANGELOG](CHANGELOG.md) for per-build notes
+**Current release:** version **1.0.1**, build **2** — see [CHANGELOG](CHANGELOG.md) for per-build notes
 
 ### Sound
 

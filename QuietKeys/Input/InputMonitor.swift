@@ -85,6 +85,16 @@ final class InputMonitor {
         self.thread = thread
     }
 
+    /// Re-arm the tap if macOS disabled it out-of-band (sleep, lock screen).
+    /// The in-callback re-enable only works while events still reach the
+    /// callback; a tap disabled during sleep never gets one.
+    func reenableIfNeeded() {
+        guard isRunning, let tap else { return }
+        if !CGEvent.tapIsEnabled(tap: tap) {
+            CGEvent.tapEnable(tap: tap, enable: true)
+        }
+    }
+
     func stop() {
         guard isRunning else { return }
         isRunning = false

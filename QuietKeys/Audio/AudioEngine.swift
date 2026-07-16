@@ -127,6 +127,15 @@ final class AudioEngine {
         engine.attach(eq)
         engine.connect(sourceNode, to: eq, format: format)
         engine.connect(eq, to: engine.mainMixerNode, format: format)
+
+        // CoreAudio tears the engine down on sleep or output-device changes;
+        // isRunning can stay stale afterwards, so rebuild explicitly.
+        NotificationCenter.default.addObserver(
+            forName: .AVAudioEngineConfigurationChange,
+            object: engine,
+            queue: .main) { [weak self] _ in
+            self?.restartAfterInterruption()
+        }
     }
 
     deinit {
@@ -138,7 +147,13 @@ final class AudioEngine {
         masterGain.deallocate()
     }
 
+    /// Whether the engine is supposed to be running (user intent, not
+    /// CoreAudio state). Lets wake/config-change handlers know if a dead
+    /// engine should be revived.
+    private var shouldBeRunning = false
+
     func start() {
+        shouldBeRunning = true
         guard !engine.isRunning else { return }
         requestSmallIOBuffer()
         engine.prepare()
@@ -146,7 +161,19 @@ final class AudioEngine {
     }
 
     func stop() {
+        shouldBeRunning = false
         engine.stop()
+    }
+
+    /// Force a full stop + start on the current output device. Used after
+    /// sleep/wake and configuration changes, where `isRunning` may report
+    /// true while the engine is actually dead.
+    func restartAfterInterruption() {
+        guard shouldBeRunning else { return }
+        engine.stop()
+        requestSmallIOBuffer()
+        engine.prepare()
+        try? engine.start()
     }
 
     /// Ask CoreAudio for a 128-frame device buffer (~2.7 ms at 48 kHz).

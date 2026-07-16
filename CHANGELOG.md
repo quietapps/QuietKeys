@@ -6,6 +6,17 @@ Format: version **X.Y.Z**, build **N** — newest first.
 
 ---
 
+## 1.0.1 — build 2 (2026-07-16)
+
+Sounds survive sleep and the lock screen.
+
+### Fixed
+
+- **Silent after sleep or lock** — waking the Mac or unlocking the screen left Quiet Keys silent until it was toggled off and on. The audio engine now rebuilds itself when CoreAudio tears it down (sleep, lock, output-device changes), and the keystroke listener re-arms if macOS disabled it while the session was locked
+- **Silent after switching audio devices** — changing the output device (e.g. connecting AirPods) now restarts the engine on the new device automatically
+
+---
+
 ## 1.0.0 — build 1 (2026-07-15)
 
 Initial release.

@@ -126,6 +126,30 @@ final class AppState: ObservableObject {
         loadActiveProfile()
         applyEnabled()
         watchPermission()
+        watchWake()
+    }
+
+    /// Sleep, the lock screen, and output-device swaps can kill the audio
+    /// engine and disable the event tap without any callback firing. Re-arm
+    /// both whenever the machine wakes or the session unlocks.
+    private func watchWake() {
+        let wake: @Sendable (Notification) -> Void = { _ in
+            Task { @MainActor in AppState.shared.resumeAfterWake() }
+        }
+        let workspace = NSWorkspace.shared.notificationCenter
+        workspace.addObserver(forName: NSWorkspace.didWakeNotification,
+                              object: nil, queue: .main, using: wake)
+        workspace.addObserver(forName: NSWorkspace.screensDidWakeNotification,
+                              object: nil, queue: .main, using: wake)
+        DistributedNotificationCenter.default().addObserver(
+            forName: Notification.Name("com.apple.screenIsUnlocked"),
+            object: nil, queue: .main, using: wake)
+    }
+
+    private func resumeAfterWake() {
+        guard enabled, hasPermission else { return }
+        engine.restartAfterInterruption()
+        monitor.reenableIfNeeded()
     }
 
     var activeProfile: Profile? {
